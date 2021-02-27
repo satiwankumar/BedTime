@@ -177,35 +177,5 @@ router.post(
 
 
 
-
-// get payment detail by id
-
-router.get('/:payment_id', [auth, checkObjectId('payment_id')], async (req, res) => {
-
-    let id = req.params.order_id
   
-    try {
-      let payment = await paymentModel.findOne({ _id: id }).populate('order').lean();
-   
-
- 
-      if (!payment) return res.status(400).json({ message: 'payment Detail not found' });
-      const url = baseUrl(req)
-  
-      // product.images.forEach((image, index) => {
-      //     product.images[index] = `${url}${product.images[index]}`
-      //     // console.log(image, index)
-      // })
-  
-      res.status(200).json(payment);
-  
-    } catch (error) {
-      // console.error(error.message);
-      res.status(500).json({ "error": error.message });
-    }
-  });
-  
-  
-
-
 module.exports=  router
