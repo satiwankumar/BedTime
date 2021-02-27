@@ -1,14 +1,8 @@
 const mongoose = require('mongoose')
-const user  = require('./User.model')
-const Service = require('./services.model')
 
-const contentSchema = new mongoose.Schema({
+const ContentSchema = new mongoose.Schema({
  
-    service: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: Service
-    },
-    
+  
     file_title:{
         type: String,
        required:true
@@ -17,14 +11,19 @@ const contentSchema = new mongoose.Schema({
         type: String,
         required:true
     },
+    file_type:{
+        type:String,
+        required:true
+    },
     file:{
-        type:[String],
-        default:null
+        type:String,
+        required:true
+
     }
 
 });
 
-contentSchema.set('timestamps',true)
+ContentSchema.set('timestamps',true)
 
 
-module.exports=  Content = mongoose.model('Content', contentSchema);
+module.exports=  Content = mongoose.model('Content', ContentSchema);

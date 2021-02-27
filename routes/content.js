@@ -6,7 +6,7 @@ const admin = require('../middleware/admin')
 const fs = require('fs');
 var path = require('path');
 const { baseUrl } = require('../utils/url')
-const User = require('../models/services.model')
+// const User = require('../models/services.model')
 const Content = require('../models/content.model')
 const checkObjectId = require('../middleware/checkobjectId');
 const multer = require('multer');
@@ -20,19 +20,19 @@ router.post('/',[auth],
         // if (!errors.isEmpty()) {
         //     return res.status(400).json({ errors: errors.array() });
         // }
-
+console.log(req.body,req.files)
         
-const {file_title,file_description,service} = req.body
+const {file_title,file_description,file_type} = req.body
       const{file}=req.files
     //   console.log(req.body) 
 
         try {
         //   console.log("file",file)
              content = new Content({
-            
-                service:service,
                 file_title:file_title,
-               file_description:file_description
+               file_description:file_description,
+               file_type:file_type
+
             });
 
             // if(file.length>0){
@@ -40,11 +40,10 @@ const {file_title,file_description,service} = req.body
                     // var data = image.replace(/^data:image\/\w+;base64,/, "");
                     // let buff = new Buffer.from(data, 'base64');
                     let r = Math.random().toString(36).substring(7)    
-                    
                     let pathName = `uploads/files/${r+" "+file.originalFilename}`;
                     var stream = fs.readFileSync(file.path);
                    await  fs.writeFileSync(path.join(__dirname, `../${pathName}`),stream)
-                    content.file.push(pathName)
+                    content.file = pathName
                     
                 // });
             // }
@@ -104,16 +103,21 @@ router.get('/', auth, async (req, res) => {
 
 
     try {
-        let content = await Content.find({ ...search }).populate('service').limit(per_page).skip(offset).sort(sort)
+        let content = await Content.find({ ...search }).limit(per_page).skip(offset).sort(sort)
      
-
+    
         // console.log(users)
         if (!content.length) {
             return res
                 .status(200)
-                .json({ message: 'no service exist' });
+                .json({ message: 'no content exist' });
         }
-     
+        const url = baseUrl(req)
+
+        content.forEach((file, index) => {
+            content[index].file = `${url}${content[index].file}`
+                            // console.log(image, index)
+                        })
         
         let Totalcount = await Content.find({ ...search }).countDocuments()
         const paginate = {
@@ -130,118 +134,118 @@ router.get('/', auth, async (req, res) => {
 });
 
 
-//getContentDetialByID
-router.get('/:content_id', [auth, checkObjectId('content_id')], async (req, res) => {
+// //getContentDetialByID
+// router.get('/:content_id', [auth, checkObjectId('content_id')], async (req, res) => {
 
-    let content_Id = req.params.content_id
+//     let content_Id = req.params.content_id
 
-    try {
-        let content = await Content.findOne({ _id: content_Id }).populate('service').lean();
-        if (!content) return res.status(400).json({ message: 'Contents not found' });
-        const url = baseUrl(req)
+//     try {
+//         let content = await Content.findOne({ _id: content_Id }).populate('service').lean();
+//         if (!content) return res.status(400).json({ message: 'Contents not found' });
+//         const url = baseUrl(req)
 
-        content.service.images.forEach((image, index) => {
-            content.service.images[index] = `${url}${content.service.images[index]}`
-                            // console.log(image, index)
-                        })
-                        content.file.forEach((image, index) => {
-                            content.file[index] = `${url}${content.file[index]}`
-                                            // console.log(image, index)
-                                        })
+//         content.service.images.forEach((image, index) => {
+//             content.service.images[index] = `${url}${content.service.images[index]}`
+//                             // console.log(image, index)
+//                         })
+//                         content.file.forEach((image, index) => {
+//                             content.file[index] = `${url}${content.file[index]}`
+//                                             // console.log(image, index)
+//                                         })
 
-       return  res.status(200).json(content)
+//        return  res.status(200).json(content)
 
-    } catch (error) {
-        // console.error(error.message);
-        res.status(500).json({ "error": error.message });
-    }
-});
+//     } catch (error) {
+//         // console.error(error.message);
+//         res.status(500).json({ "error": error.message });
+//     }
+// });
 
-//EditContentDetialByID
+// //EditContentDetialByID
 
-router.put('/edit/:content_id',
-    [
-        auth,
-        checkObjectId('content_id'),
-        [
-            check('file_title', 'Title is required').not().isEmpty(),
-            check('file_description', 'Description is required').not().isEmpty()
+// router.put('/edit/:content_id',
+//     [
+//         auth,
+//         checkObjectId('content_id'),
+//         [
+//             check('file_title', 'Title is required').not().isEmpty(),
+//             check('file_description', 'Description is required').not().isEmpty()
             
-        ],
-    ],
-    async (req, res) => {
-        let content_id = req.params.content_id
+//         ],
+//     ],
+//     async (req, res) => {
+//         let content_id = req.params.content_id
 
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            res.status(400).json({ errors: errors.array() });
-        }
-
-
-        const {
-          file_title,
-          file_description,
-          service_id
+//         const errors = validationResult(req);
+//         if (!errors.isEmpty()) {
+//             res.status(400).json({ errors: errors.array() });
+//         }
 
 
-        } = req.body;
+//         const {
+//           file_title,
+//           file_description,
+//           service_id
 
 
-        try {
+//         } = req.body;
 
 
-            let content = await Content.findOne({ _id: content_id })
-            // console.log(content)
-            if (!content) {
-                return res
-                    .status(400)
-                    .json({ message: 'no  Serivce Found' });
-            }
-            content.file_title = file_title
-            content.file_description = file_description
-            content.service=  service_id
+//         try {
+
+
+//             let content = await Content.findOne({ _id: content_id })
+//             // console.log(content)
+//             if (!content) {
+//                 return res
+//                     .status(400)
+//                     .json({ message: 'no  Serivce Found' });
+//             }
+//             content.file_title = file_title
+//             content.file_description = file_description
+//             content.service=  service_id
         
-                await content.save();
-            // const url =   baseUrl(req)  
+//                 await content.save();
+//             // const url =   baseUrl(req)  
          
-            // service.images.forEach((image, index) => {
-            //     service.images[index] = `${url}${service.images[index]}`
-            //     // console.log(image, index)
-            // })
+//             // service.images.forEach((image, index) => {
+//             //     service.images[index] = `${url}${service.images[index]}`
+//             //     // console.log(image, index)
+//             // })
     
-            res.status(200).json({
-                message: "Content Updated Successfully",
-                content: content
-            });
-        } catch (err) {
+//             res.status(200).json({
+//                 message: "Content Updated Successfully",
+//                 content: content
+//             });
+//         } catch (err) {
           
            
-                const errors =[]
-                errors.push({message : err.message}) 
-                res.status(500).json({ errors: errors });
+//                 const errors =[]
+//                 errors.push({message : err.message}) 
+//                 res.status(500).json({ errors: errors });
             
-        }
-    }
-);
+//         }
+//     }
+// );
 
-router.post('/remove',[auth,admin],async(req,res)=>{
-    try { 
-   const content_id = req.body.content_id
-    const content =  await  Content.findOneAndDelete({ _id: content_id })
-        if(!content){
-  return res.status(200).json({"message":"content not found"})
+// router.post('/remove',[auth,admin],async(req,res)=>{
+//     try { 
+//    const content_id = req.body.content_id
+//     const content =  await  Content.findOneAndDelete({ _id: content_id })
+//         if(!content){
+//   return res.status(200).json({"message":"content not found"})
 
- } 
-  return res.status(200).json({"message":"content deleted Successfully"})
+//  } 
+//   return res.status(200).json({"message":"content deleted Successfully"})
 
-    } catch (err) {
-        console.error(err.message);
-        return res.status(500).json({ error: err.message });
-    }
+//     } catch (err) {
+//         console.error(err.message);
+//         return res.status(500).json({ error: err.message });
+//     }
   
 
 
-})
+// })
 
 
 
