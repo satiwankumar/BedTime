@@ -26,7 +26,7 @@ status:{
  type:Boolean
     
 },
-type:{
+payment_method:{
     type:String
 }
 });

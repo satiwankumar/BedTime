@@ -7,7 +7,9 @@ const admin = require('../middleware/admin')
 const { SendPushNotification } = require('../utils/Notification')
 const paymentModel = require("../models/payment.model");
 const checkObjectId = require('../middleware/checkobjectId');
-
+const payment  =  require('../models/payment.model')
+const stripe = require("stripe")("sk_test_RG4EfYiSTOT8IxuNxbeMeDiy");
+const User = require('../models/User.model')
 
 //get payment 
 router.get('/', auth,admin, async (req, res) => {
@@ -86,16 +88,21 @@ router.post(
   
   
       try {
-  
-        
         let customer = ""
         let charge = ""
-        if (req.body.paymentMethod.toLowerCase() == "paypal") {
-          order.paymentMethod = req.body.paymentMethod
+        let user = await User.findOne({_id:req.user._id})
+
+        const paymentLog = new paymentModel({
+            user: req.user._id,
+            amount: req.body.totalPrice,
+          });
+
+        if (req.body.payment_method.toLowerCase() == "paypal") {
+            paymentLog.payment_method = req.body.payment_method
         }
   
-        else if (req.body.paymentMethod.toLowerCase() == "stripe") {
-          order.paymentMethod = req.body.paymentMethod
+        else if (req.body.payment_method.toLowerCase() == "stripe") {
+            paymentLog.payment_method = req.body.payment_method
           let m = req.body.card_expiry.split("/")
           let cardNumber = req.body.card_number;
           let token = await stripe.tokens.create({
@@ -114,33 +121,27 @@ router.post(
             email: req.user.email,
             source: token.id,
           })
-          // console.log("customer",customer)
+        //   console.log("customer",customer)
   
           charge = await stripe.charges.create({
             amount: req.body.totalPrice,
-            description: 'Paleo Keto',
+            description: 'Bed Time',
             currency: 'usd',
             customer: customer.id
           })
-          // console.log("charge",charge)
+        //   console.log("charge",charge)
   
-  
+          paymentLog.customer_id= customer.id?customer.id:null,
+          paymentLog.charge_id=charge.id?charge.id:null
         }
-        const createdOrder = await order.save();
-  
-        const paymentLog = new paymentModel({
-          order: createdOrder.id,
-          user: req.user._id,
-          customer_id: req.body.paymentMethod == "cod" ? null : customer.id,
-          charge_id: req.body.paymentMethod == "cod" ? null : charge.id,
-          amount: req.body.totalPrice,
-          type: req.body.paymentMethod == "cod" ? "cod" : "card"
-        });
+    
+       
   
         await paymentLog.save();
+        user.is_premium=true
+        await user.save()
   
-  
-        return res.status(201).send({ message: 'New Order Created', order: createdOrder });
+        return res.status(201).send({ message: 'Payment Done Successfully', payment:paymentLog });
       }
   
   
@@ -177,7 +178,7 @@ router.post(
 
 
 
-// get order detail by id
+// get payment detail by id
 
 router.get('/:payment_id', [auth, checkObjectId('payment_id')], async (req, res) => {
 
