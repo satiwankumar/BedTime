@@ -270,6 +270,8 @@ router.get('/', auth, async (req, res) => {
 
         content.forEach((file, index) => {
             content[index].file = `${url}${content[index].file}`
+            content[index].file_image = `${url}${content[index].file_image}`
+            
                             // console.log(image, index)
                         })
         
