@@ -9,8 +9,9 @@ const { baseUrl } = require('../utils/url')
 // const User = require('../models/services.model')
 const Content = require('../models/content.model')
 const checkObjectId = require('../middleware/checkobjectId');
-const multer = require('multer');
-const upload = multer();
+// const multer = require('multer');
+const { count } = require('../models/content.model');
+// const upload = multer();
 
 //post Service
 
@@ -22,8 +23,8 @@ router.post('/',[auth],
         // }
 console.log(req.body,req.files)
         
-const {file_title,file_description,file_type} = req.body
-      const{file}=req.files
+const {file_title,file_description,file_type,file_age_group,is_premium,language} = req.body
+      const{file,file_image}=req.files
     //   console.log(req.body) 
 
         try {
@@ -31,7 +32,10 @@ const {file_title,file_description,file_type} = req.body
              content = new Content({
                 file_title:file_title,
                file_description:file_description,
-               file_type:file_type
+               file_type:file_type,
+               file_age_group:file_age_group,
+               is_premium:is_premium,
+               language:language
 
             });
 
@@ -39,14 +43,28 @@ const {file_title,file_description,file_type} = req.body
             //     file.forEach( async file => {
                     // var data = image.replace(/^data:image\/\w+;base64,/, "");
                     // let buff = new Buffer.from(data, 'base64');
-                    let r = Math.random().toString(36).substring(7)    
-                    let pathName = `uploads/files/${r+" "+file.originalFilename}`;
-                    var stream = fs.readFileSync(file.path);
-                   await  fs.writeFileSync(path.join(__dirname, `../${pathName}`),stream)
-                    content.file = pathName
+                    if(file){
+                        let r = Math.random().toString(36).substring(7)    
+                        let pathName = `uploads/files/${file.originalFilename.replace(/\s/g, '')}`;
+                        var stream = fs.readFileSync(file.path);
+                       await  fs.writeFileSync(path.join(__dirname, `../${pathName}`),stream)
+                        content.file = pathName
+                    }
+                    
                     
                 // });
             // }
+                if(file_image){
+                      // var data = image.replace(/^data:image\/\w+;base64,/, "");
+                    // let buff = new Buffer.from(data, 'base64');
+                    let r = Math.random().toString(36).substring(7)    
+                    let pathName = `uploads/images/${file_image.originalFilename.replace(/\s/g, '')}`;
+                    var stream = fs.readFileSync(file.path);
+                   await  fs.writeFileSync(path.join(__dirname, `../${pathName}`),stream)
+                    content.file_image = pathName
+                    
+                }
+
   
             await content.save();
 
@@ -80,14 +98,136 @@ const {file_title,file_description,file_type} = req.body
 );
 
 
+router.post('/like/:id',[auth],
+    async (req, res) => {
+
+
+        try {
+              const content = await Content.findById(req.params.id)
+                if(content.likes.filter(like=>like.user ==req.user._id).length>0){
+                    let userIndex  =content.likes.findIndex(like=>like.user ==req.user._id)
+                    console.log("content.indexOf(user)",userIndex)
+                    content.likes.splice(userIndex,1)
+
+                }else{
+                    content.likes.unshift({user:req.user._id})
+                }
+
+                await content.save()
+
+
+
+            //   let contents =  await  Content.aggregate(
+            //         // [
+            //         // {$unwind : "$likes"},
+            //         //   { $group : { _id : "$_id" , count : { $sum : 1 } } },
+            //         //   { $sort : { count : -1 } },
+            //         //   { $limit : 5 }
+            //         // ]
+            //         [
+            //             {
+            //               $project: {
+            //                 _id: 1,
+            //                 numberOfLikes: {
+            //                   $cond: {
+            //                     if: {
+            //                       $isArray: "$likes"
+            //                     },
+            //                     then: {
+            //                       $size: "$likes"
+            //                     },
+            //                     else: "NA"
+            //                   }
+                              
+            //                  }
+            //                 // {$sort: { numberOfLikes: -1 } }
+
+            //               }
+            //             }
+            //           ]
+            //       )
+                  
+
+
+                return res.json(content)
+
+            
+        } catch (error) {
+            console.error(error.message);
+            res.status(500).json({ error: error.message });
+        }
+    }
+);
+
+
+
+// 
+router.get('/trending',[auth],
+async (req, res) => {
+
+
+    try {
+        //   const content = await Content.findById(req.params.id)
+        //     if(content.likes.filter(like=>like.user ==req.user._id).length>0){
+        //         let userIndex  =content.likes.findIndex(like=>like.user ==req.user._id)
+        //         console.log("content.indexOf(user)",userIndex)
+        //         content.likes.splice(userIndex,1)
+
+        //     }else{
+        //         content.likes.unshift({user:req.user._id})
+        //     }
+
+        //     await content.save()
+
+
+
+          let contents =  await  Content.aggregate(
+                // [
+                // {$unwind : "$likes"},
+                //   { $group : { _id : "$_id" , count : { $sum : 1 } } },
+                //   { $sort : { count : -1 } },
+                //   { $limit : 5 }
+                // ]
+                [
+                    {$unwind : "$likes"},
+                    {$group : { 
+                        _id : "$_id",
+                        content : {"$addToSet" : {'fileType':'$file_title'}},
+                        likes : {$push : "$likes"},
+                        count : {$sum : 1},
+                     },
+                    },
+                    {$sort : {'count': -1}},
+                ]
+                    
+              )
+              
+
+
+            return res.json(contents)
+
+        
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).json({ error: error.message });
+    }
+}
+);
+
+
+
+
+
+
 //getContent
 router.get('/', auth, async (req, res) => {
-    const { page, limit, fieldname, order, searchBy } = req.query
+    const { page, limit, fieldname, order, searchBy ,selection} = req.query
     const currentpage = page ? parseInt(page, 10) : 1
     const per_page = limit ? parseInt(limit, 10) : 5
     const CurrentField = fieldname ? fieldname : "createdAt"
     const currentOrder = order ? parseInt(order, 10) : -1
     let offset = (currentpage - 1) * per_page;
+    // let Selection = selection?selection:""
     const sort = {};
     sort[CurrentField] = currentOrder
     // return res.json(sort)
@@ -101,9 +241,23 @@ router.get('/', auth, async (req, res) => {
         ]
     } : {};
 
+    const filter = {};
 
+      for (const key in req.query) {
+        if (req.query.hasOwnProperty(key)) {
+          const value = req.query[key];
+          if (key=="page" || key=="limit"){
+
+          }
+          else if(value){
+            filter[key] = value;
+                
+          }
+        }
+      }
+    console.log(filter)
     try {
-        let content = await Content.find({ ...search }).limit(per_page).skip(offset).sort(sort)
+        let content = await Content.find({ ...search,...filter }).limit(per_page).skip(offset).sort(sort)
      
     
         // console.log(users)

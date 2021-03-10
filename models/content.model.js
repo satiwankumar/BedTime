@@ -18,8 +18,33 @@ const ContentSchema = new mongoose.Schema({
     file:{
         type:String,
         required:true
+    },
+    file_age_group:{
+        type:String,
+        default:null
+        
+    },
+    file_image:{
+        type:String
+        
+    },
+    is_premium:{
+        type:Boolean,
+        default:false
+    },
+    language:{
+        type:String,
+        required:true
+    },
+    likes:[
+        {
+            user:{
+                type: mongoose.Schema.Types.ObjectId,
+                ref:'user'
+            }
+        }
+    ],
 
-    }
 
 });
 

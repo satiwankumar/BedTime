@@ -169,7 +169,9 @@ router.post('/signup', [
     check('password', 'please enter a password of 6 or more characters').isLength({ min: 6 }),
     check('confirmpassword', 'please enter a password of 6 or more characters').isLength({ min: 6 }),
     check('level_type', 'please enter a level type').not().isEmpty(),
-    check('age_group', 'please enter a Age Group').not().isEmpty()
+    check('age_group', 'please enter a Age Group').not().isEmpty(),
+    check('gender', 'please enter gender').not().isEmpty()
+
     // check('premium_code', 'please enter premium_code').not().isEmpty()
 
 
@@ -217,13 +219,13 @@ router.post('/signup', [
             fs.writeFileSync(path.join(__dirname, `../${pathName}`), buff)
             // var full_address = req.protocol + "://" + req.headers.host ;
         }
-        else if (req.body.gender.toLowerCase() == "male") {
+        else if (req.body.gender&&req.body.gender.toLowerCase() == "male") {
 
             pathName = "uploads/images/male.jpg"
 
 
         }
-        else if (req.body.gender.toLowerCase() == "female") {
+        else if (req.body.gender&& req.body.gender.toLowerCase() == "female") {
 
             pathName = "uploads/images/female.jpg"
 
