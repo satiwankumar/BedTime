@@ -59,7 +59,7 @@ const {file_title,file_description,file_type,file_age_group,is_premium,language}
                     // let buff = new Buffer.from(data, 'base64');
                     let r = Math.random().toString(36).substring(7)    
                     let pathName = `uploads/images/${file_image.originalFilename.replace(/\s/g, '')}`;
-                    var stream = fs.readFileSync(file.path);
+                    var stream = await fs.readFileSync(file.path);
                    await  fs.writeFileSync(path.join(__dirname, `../${pathName}`),stream)
                     content.file_image = pathName
                     

@@ -243,20 +243,20 @@ router.post('/signup', [
             gender:req.body.gender
             //   image: req.file.path 
         });
-        console.log("thhis",codes)
-        if (req.body.premium_code) {
-          let found = codes.find(code=> {return code.used==false && code.code==req.body.premium_code})
-           if(found){
-            let index = codes.findIndex(code=>code.used==false && code.code==req.body.premium_code)
-            codes[index].used=true
-            // codes.splice(index, 1)
-            user.is_premium =true
-           }
-           else{
-            error.push({ message: "Invalid code " })
-            return res.status(400).json({ errors: error })
-           }
-        }
+        // console.log("thhis",codes)
+        // if (req.body.premium_code) {
+        //   let found = codes.find(code=> {return code.used==false && code.code==req.body.premium_code})
+        //    if(found){
+        //     let index = codes.findIndex(code=>code.used==false && code.code==req.body.premium_code)
+        //     codes[index].used=true
+        //     // codes.splice(index, 1)
+        //     user.is_premium =true
+        //    }
+        //    else{
+        //     error.push({ message: "Invalid code " })
+        //     return res.status(400).json({ errors: error })
+        //    }
+        // }
 
 
         //hash passoword
