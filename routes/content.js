@@ -55,11 +55,11 @@ const {file_title,file_description,file_type,file_age_group,is_premium,language}
                 // });
             // }
                 if(file_image){
-                      // var data = image.replace(/^data:image\/\w+;base64,/, "");
+                    //  file_image.replace(/^data:image\/\w+;base64,/, "");
                     // let buff = new Buffer.from(data, 'base64');
                     let r = Math.random().toString(36).substring(7)    
                     let pathName = `uploads/images/${file_image.originalFilename.replace(/\s/g, '')}`;
-                    var stream = await fs.readFileSync(file.path);
+                    var stream = await fs.readFileSync(file_image.path);
                    await  fs.writeFileSync(path.join(__dirname, `../${pathName}`),stream)
                     content.file_image = pathName
                     
@@ -225,7 +225,7 @@ router.get('/', auth, async (req, res) => {
     const currentpage = page ? parseInt(page, 10) : 1
     const per_page = limit ? parseInt(limit, 10) : 5
     const CurrentField = fieldname ? fieldname : "createdAt"
-    const currentOrder = order ? parseInt(order, 10) : -1
+    const currentOrder = order ? parseInt(order, 10) : 1
     let offset = (currentpage - 1) * per_page;
     // let Selection = selection?selection:""
     const sort = {};

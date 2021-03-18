@@ -30,7 +30,7 @@ const ContentSchema = new mongoose.Schema({
     },
     is_premium:{
         type:Boolean,
-        default:false
+        default:true
     },
     language:{
         type:String,
