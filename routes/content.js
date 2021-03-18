@@ -405,5 +405,35 @@ router.get('/', auth, async (req, res) => {
 
 
 
+//update
+router.post('/update', auth, async (req, res) => {
+  
+   
+
+    
+    try {
+   
+        // let content =await Content.updateMany(
+        //     { language:"fr",file_type:"pronunciation" },
+        //     [{
+        //       $set: {file_description: {
+        //         $replaceOne: { input: "$file_description", find: "Pronunciation Of Alphabet", replacement: "Prononciation de l'alphabet" }
+        //       }}
+        //     }]
+        //   )
+        // let content =await Content.updateMany(
+        //     [{
+        //       $set: {is_premium:true}
+        //     }])
+        
+
+        // res.status(200).json(content)
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+
+
 
 module.exports = router
