@@ -164,20 +164,23 @@ router.post('/like/:id',[auth],
 // 
 router.get('/trending',[auth],
 async (req, res) => {
+    const filter = {};
 
+      for (const key in req.query) {
+        if (req.query.hasOwnProperty(key)) {
+          const value = req.query[key];
+          if (key=="page" || key=="limit"){
+
+          }
+          else if(value){
+            filter[key] = value;
+                
+          }
+        }
+      }
 
     try {
-        //   const content = await Content.findById(req.params.id)
-        //     if(content.likes.filter(like=>like.user ==req.user._id).length>0){
-        //         let userIndex  =content.likes.findIndex(like=>like.user ==req.user._id)
-        //         console.log("content.indexOf(user)",userIndex)
-        //         content.likes.splice(userIndex,1)
-
-        //     }else{
-        //         content.likes.unshift({user:req.user._id})
-        //     }
-
-        //     await content.save()
+      
 
 
         const url = baseUrl(req)
@@ -185,6 +188,7 @@ async (req, res) => {
           let contents =  await  Content.aggregate(
                 
                 [
+                    { $match : { ...filter } },
                     {$unwind : "$likes"},
                     {
                         $group :
