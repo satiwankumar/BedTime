@@ -180,21 +180,31 @@ async (req, res) => {
         //     await content.save()
 
 
+        const url = baseUrl(req)
 
           let contents =  await  Content.aggregate(
-                // [
-                // {$unwind : "$likes"},
-                //   { $group : { _id : "$_id" , count : { $sum : 1 } } },
-                //   { $sort : { count : -1 } },
-                //   { $limit : 5 }
-                // ]
+                
                 [
                     {$unwind : "$likes"},
-                    {$group : { 
+                    {
+                        $group :
+                    { 
                         _id : "$_id",
-                        content : {"$addToSet" : {'fileType':'$file_title'}},
+                        content : {"$addToSet" : {'file_title':'$file_title',
+                        "file_age_group": "$file_age_group",
+                        "is_premium": "$is_premium",
+                        "_id": "$_id",
+                        "file_title": "$file_title",
+                        "file_description": "$file_description",
+                        "file_type": "$file_type",
+                        "language": "$language",
+                        "file": {$concat:[url,"$file"]},
+                        "file_image":  {$concat:[url,"$file_image"]}
+                        // "file_image": { $concat:[`${`url+"$file_image"`}]}
+                       
+                    }},
                         likes : {$push : "$likes"},
-                        count : {$sum : 1},
+                        count : {$sum : 1}
                      },
                     },
                     {$sort : {'count': -1}},
@@ -202,6 +212,9 @@ async (req, res) => {
                     
               )
               
+              if(!contents.length){
+               return res.json({"message":"no Trending Data Exist"})   
+              }
 
 
             return res.json(contents)
