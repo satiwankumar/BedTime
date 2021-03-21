@@ -274,7 +274,7 @@ router.get('/', auth, async (req, res) => {
       }
     console.log(filter)
     try {
-        let content = await Content.find({ ...search,...filter }).limit(per_page).skip(offset).sort(sort)
+        let content = await Content.find({ ...search,...filter }).limit(per_page).skip(offset).sort(sort).lean()
      
     
         // console.log(users)
@@ -285,12 +285,22 @@ router.get('/', auth, async (req, res) => {
         }
         const url = baseUrl(req)
 
-        content.forEach((file, index) => {
+        content.forEach((item, index) => {
             content[index].file = `${url}${content[index].file}`
             content[index].file_image = `${url}${content[index].file_image}`
-            
+           item.likes.length>0? item.likes.forEach((like,index)=>{
+                if(like.user==req.user._id){
+                    console.log("true")
+                    item.isliked="true"
+                }
+                else{
+                    item.isliked = "false"
+                }
+            }):item.isliked="false"
                             // console.log(image, index)
                         })
+        
+         content.isliked="true"
         
         let Totalcount = await Content.find({ ...search }).countDocuments()
         const paginate = {
@@ -431,20 +441,19 @@ router.post('/update', auth, async (req, res) => {
     try {
    
         // let content =await Content.updateMany(
-        //     { language:"fr",file_type:"pronunciation" },
+        //     { file_type:"pronunciation" },
         //     [{
-        //       $set: {file_description: {
-        //         $replaceOne: { input: "$file_description", find: "Pronunciation Of Alphabet", replacement: "Prononciation de l'alphabet" }
-        //       }}
+        //       $set: {is_premium:}
         //     }]
         //   )
-        // let content =await Content.updateMany(
-        //     [{
-        //       $set: {is_premium:true}
-        //     }])
+        let content =await Content.updateMany(
+            { file_type:"animal" },
+            {
+              $set: {is_premium:false}
+            })
         
 
-        // res.status(200).json(content)
+        res.status(200).json(content)
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
