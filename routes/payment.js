@@ -101,7 +101,7 @@ router.post(
 
         const paymentLog = new paymentModel({
             user: req.user._id,
-            amount: req.body.totalPrice,
+            amount: req.body.totalPrice*100,
           });
 
         if (req.body.payment_method.toLowerCase() == "paypal") {
@@ -131,7 +131,7 @@ router.post(
         //   console.log("customer",customer)
   
           charge = await stripe.charges.create({
-            amount: req.body.totalPrice,
+            amount: req.body.totalPrice*100,
             description: 'Bed Time',
             currency: 'usd',
             customer: customer.id
@@ -191,7 +191,7 @@ router.post(
             payment_method: "paypal"
         },
         redirect_urls: {
-            return_url: "http://192.168.1.106:3000/success",
+            return_url: "http://localhost:5000/api/payment/success",
             cancel_url: "http://192.168.1.106:3000/cancel"
         },
         transactions: [
@@ -222,14 +222,34 @@ router.post(
         } else {
             console.log("Create Payment Response");
             console.log(payment);
-            res.redirect(payment.links[1].href);
+            res.redirect(`${payment.links[1].href}`);
         }
     });
 })
 
 
 
-router.post("/success",async(req, res) => {
+router.get("/success",auth,async(req, res) => {
+  try {
+  
+    res.render("success");
+    // return res.status(201).send({ message: 'Payment Done Successfully', payment:paymentLog });
+  } catch (error) {
+    return res.json({"error":error})
+  }
+  // res.send("Success");
+
+});
+
+
+
+
+
+router.post("/buypaypal",[auth,
+  check('payerId',"payerId is requred").not().isEmpty(),
+  check('paymentId',"paymentId is requred").not().isEmpty()
+
+],async(req, res) => {
   try {
     let user = await User.findOne({_id:req.user._id})
 
@@ -237,44 +257,17 @@ router.post("/success",async(req, res) => {
         user: req.user._id,
         amount: req.body.totalPrice,
       });
-    var PayerID = req.query.PayerID;
-    var paymentId = req.query.paymentId;
-    var execute_payment_json = {
-        payer_id: PayerID,
-        transactions: [
-            {
-                amount: {
-                    currency: "USD",
-                    total: req.body.totalPrice
-                }
-            }
-        ]
-    };
-  
-    paypal.payment.execute(paymentId, execute_payment_json, function(
-        error,
-        payment
-    ) {
-        if (error) {
-            console.log(error.response);
-            throw error;
-        } else {
-            console.log("Get Payment Response");
-            console.log(JSON.stringify(payment));
-            // res.render("success");
-  
-
-
-        }
-    });
+    var PayerID = req.body.payerId;
+    var paymentId = req.body.paymentId;
+   
     paymentLog.payment_method = "paypal"
     paymentLog.customer_id= PayerID?PayerID:null,
-    paymentLog.paymentId=paymentId?paymentId:null
+    paymentLog.charge_id=paymentId?paymentId:null
 
     await paymentLog.save();
     user.is_premium=true
     await user.save()
-
+ 
     return res.status(201).send({ message: 'Payment Done Successfully', payment:paymentLog });
   } catch (error) {
     
@@ -282,6 +275,7 @@ router.post("/success",async(req, res) => {
   // res.send("Success");
 
 });
+
 
 
 

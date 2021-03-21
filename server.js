@@ -1,10 +1,12 @@
 const express = require('express')
 // var expressBusboy = require('express-busboy');
+const engines = require("consolidate");
 
 const app = express()
 const path  = require('path')
 const port  = process.env.port || 5000
 // var multer = require('multer')
+
 const connectDB = require('./config/db')
 var cors = require('cors');
 require('dotenv').config()
@@ -20,7 +22,9 @@ connectDB()
 app.use(multipart());
 
   
-
+app.engine('ejs', require('ejs').__express)
+app.set("views", path.join(__dirname,'templates'))
+app.set("view engine", "ejs");
 app.use(cors())
 app.options('*', cors())
 app.use(express.json({limit: '50mb'}));
@@ -54,4 +58,8 @@ app.get('/',(req,res)=>{
 })
 app.listen(port,()=>{
     console.log(`Server is running at the port ${port}`)
+})
+
+app.get('/success',(req,res)=>{
+      res.render('success')
 })
