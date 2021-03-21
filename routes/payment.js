@@ -229,35 +229,58 @@ router.post(
 
 
 
-router.get("/success",(req, res) => {
-  // res.send("Success");
-  var PayerID = req.query.PayerID;
-  var paymentId = req.query.paymentId;
-  var execute_payment_json = {
-      payer_id: PayerID,
-      transactions: [
-          {
-              amount: {
-                  currency: "USD",
-                  total: "1.00"
-              }
-          }
-      ]
-  };
+router.get("/success",async(req, res) => {
+  try {
+    let user = await User.findOne({_id:req.user._id})
 
-  paypal.payment.execute(paymentId, execute_payment_json, function(
-      error,
-      payment
-  ) {
-      if (error) {
-          console.log(error.response);
-          throw error;
-      } else {
-          console.log("Get Payment Response");
-          console.log(JSON.stringify(payment));
-          res.render("success");
-      }
-  });
+    const paymentLog = new paymentModel({
+        user: req.user._id,
+        amount: req.body.totalPrice,
+      });
+    var PayerID = req.query.PayerID;
+    var paymentId = req.query.paymentId;
+    var execute_payment_json = {
+        payer_id: PayerID,
+        transactions: [
+            {
+                amount: {
+                    currency: "USD",
+                    total: req.body.totalPrice
+                }
+            }
+        ]
+    };
+  
+    paypal.payment.execute(paymentId, execute_payment_json, function(
+        error,
+        payment
+    ) {
+        if (error) {
+            console.log(error.response);
+            throw error;
+        } else {
+            console.log("Get Payment Response");
+            console.log(JSON.stringify(payment));
+            // res.render("success");
+  
+
+
+        }
+    });
+    paymentLog.payment_method = "paypal"
+    paymentLog.customer_id= PayerID?PayerID:null,
+    paymentLog.paymentId=paymentId?paymentId:null
+
+    await paymentLog.save();
+    user.is_premium=true
+    await user.save()
+
+    return res.status(201).send({ message: 'Payment Done Successfully', payment:paymentLog });
+  } catch (error) {
+    
+  }
+  // res.send("Success");
+
 });
 
 
