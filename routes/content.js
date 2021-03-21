@@ -288,19 +288,24 @@ router.get('/', auth, async (req, res) => {
         content.forEach((item, index) => {
             content[index].file = `${url}${content[index].file}`
             content[index].file_image = `${url}${content[index].file_image}`
-           item.likes.length>0? item.likes.forEach((like,index)=>{
+            item.isliked="false"
+            
+               item.likes.forEach((like,index)=>{
                 if(like.user==req.user._id){
-                    console.log("true")
+                    
+                    console.log("usertrue")
                     item.isliked="true"
+                    
+
                 }
-                else{
-                    item.isliked = "false"
-                }
-            }):item.isliked="false"
+                // else{
+                //     item.isliked = "false"
+                // }
+            })
                             // console.log(image, index)
                         })
         
-         content.isliked="true"
+        //  content.isliked="true"
         
         let Totalcount = await Content.find({ ...search }).countDocuments()
         const paginate = {
