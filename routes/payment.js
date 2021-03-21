@@ -8,7 +8,7 @@ const { SendPushNotification } = require('../utils/Notification')
 const paymentModel = require("../models/payment.model");
 const checkObjectId = require('../middleware/checkobjectId');
 const payment  =  require('../models/payment.model')
-const stripe = require("stripe")("sk_test_RG4EfYiSTOT8IxuNxbeMeDiy");
+const stripe = require("stripe")("sk_test_51IXUPEBGTHpfB5dWrRwWJRCYGiv3lqLJdT6eqegdCFNP4KFQRI1qjOlyget9rjUoqFpDTmGqU73IHSe10y9L3iDF00ZtY5Qo39");
 const User = require('../models/User.model')
 const paypal = require("paypal-rest-sdk");
 
