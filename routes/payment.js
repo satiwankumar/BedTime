@@ -184,7 +184,7 @@ router.post(
 
 
 
-  router.get('/paypal',auth,(req, res) => {
+  router.get('/paypal',(req, res) => {
     var create_payment_json = {
         intent: "sale",
         payer: {
@@ -229,7 +229,7 @@ router.post(
 
 
 
-router.get("/success",async(req, res) => {
+router.post("/success",async(req, res) => {
   try {
     let user = await User.findOne({_id:req.user._id})
 
