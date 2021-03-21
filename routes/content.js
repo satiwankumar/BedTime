@@ -219,7 +219,25 @@ async (req, res) => {
               if(!contents.length){
                return res.json({"message":"no Trending Data Exist"})   
               }
-
+              contents.forEach((item, index) => {
+           
+                item.isliked="false"
+                
+                   item.likes.forEach((like,index)=>{
+                    if(like.user==req.user._id){
+                        
+                        console.log("usertrue")
+                        item.isliked="true"
+                        
+    
+                    }
+                    // else{
+                    //     item.isliked = "false"
+                    // }
+                })
+                                // console.log(image, index)
+                            })
+            
 
             return res.json(contents)
 
