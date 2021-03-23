@@ -4,7 +4,7 @@ const engines = require("consolidate");
 
 const app = express()
 const path  = require('path')
-const port  = process.env.port || 5000
+const PORT = process.env.PORT || 5000
 // var multer = require('multer')
 
 const connectDB = require('./config/db')
@@ -56,8 +56,8 @@ app.get("/uploads/images/:name", (req, res) => {
 app.get('/',(req,res)=>{
     res.send('server runnning')
 })
-app.listen(port,()=>{
-    console.log(`Server is running at the port ${port}`)
+app.listen(PORT,()=>{
+    console.log(`Server is running at the port ${PORT}`)
 })
 
 app.get('/success',(req,res)=>{

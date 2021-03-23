@@ -511,59 +511,6 @@ router.get('/logout', auth, async (req, res) => {
 
 })
 
-// if (moment().utcOffset(0) > user.passwordResetExpires) {
-//           return res.status(400).send({
-//             message: "Token has expired."
-//           });
-//         }
-// If we found a token, find a matching user
-//   User.findById(token._userId, function(err, user) {
-//     if (err) {
-//       return res.status(500).send({ message: err.message });
-//     }
-//     if (!user)
-//       return res
-//         .status(400)
-//         .send({ message: `We were unable to find a user for this token.` });
-//     if (user.passwordResetToken !== token.token)
-//       return res.status(400).send({
-//         message:
-//           "User token and your token didn't match. You may have a more recent token in your mail list."
-//       });
-//     // Verify that the user token expires date has not been passed
-//     if (moment().utcOffset(0) > user.passwordResetExpires) {
-//       return res.status(400).send({
-//         message: "Token has expired."
-//       });
-//     }
-//     // Update user
-//     user.password = req.body.password;
-//     user.passwordResetToken = "nope";
-//     user.passwordResetExpires = moment().utcOffset(0);
-//     //Hash new password
-//     user.hashPassword().then(() =>
-//       // Save updated user to the database
-//       user.save(function(err) {
-//         if (err) {
-//           return res.status(500).send({ message: err.message });
-//         }
-//         // Send mail confirming password change to the user
-//         const mail = {
-//           to: user.email,
-//           from: `no-reply@mern-auth-server.herokuapp.com`,
-//           subject: "Your password has been changed",
-//           text: "Some useless text",
-//           html: `<p>This is a confirmation that the password for your account ${
-//             user.email
-//           } has just been changed. </p>`
-//         };
-//         sgMail.send(mail).catch(error => {
-//           return res.status(500).send({ message: error });
-//         });
-//         return res
-//           .status(200)
-//           .send({ message: "Password has been reset. Please log in." });
-//       })
-//     );
+
 
 module.exports = router
