@@ -191,8 +191,8 @@ router.post(
             payment_method: "paypal"
         },
         redirect_urls: {
-            return_url: "http://localhost:5000/api/payment/success",
-            cancel_url: "http://192.168.1.106:3000/cancel"
+            return_url: "http://192.168.1.106:5000/api/payment/success",
+            cancel_url: "http://192.168.1.106:5000/api/payment/cancel"
         },
         transactions: [
             {
@@ -229,7 +229,7 @@ router.post(
 
 
 
-router.get("/success",auth,async(req, res) => {
+router.get("/success",async(req, res) => {
   try {
   
     res.render("success");
@@ -251,6 +251,7 @@ router.post("/buypaypal",[auth,
 
 ],async(req, res) => {
   try {
+    console.log('PAYPAL')
     let user = await User.findOne({_id:req.user._id})
 
     const paymentLog = new paymentModel({
