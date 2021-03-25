@@ -188,7 +188,7 @@ async (req, res) => {
           let contents =  await  Content.aggregate(
                 
                 [
-                    { $match : { ...filter } },
+                    { $match : { ...filter  }},
                     {$unwind : "$likes"},
                     {
                         $group :
@@ -212,7 +212,10 @@ async (req, res) => {
                         count : {$sum : 1}
                      },
                     },
+                    // { $limit: 5 },
+                    { $match: {'count':  {$gte: 5} }}, 
                     {$sort : {'count': -1}},
+                    { $limit : 5 }
                 ]
                     
               )
