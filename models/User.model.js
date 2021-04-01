@@ -99,6 +99,19 @@ const UserSchema = new mongoose.Schema({
     is_premium:{
         type:Boolean,
         default:false
+    },
+    parents:{
+        type:String,
+        default:null
+    },
+    city:{
+        type:String
+    },
+    zip_code:{
+        type:String
+    },
+    address:{
+        type:String
     }
     
 });

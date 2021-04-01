@@ -119,7 +119,7 @@ router.post(
          
             res.status(200).json({
                 "message": "Log in Successfull",
-                "user": (_.pick(user, ['_id', 'username', 'email', 'image', 'level_type','age_group','is_premium','gender', 'createdAt','updatedAt'])),
+                "user": user,
 
                 "token": token
 

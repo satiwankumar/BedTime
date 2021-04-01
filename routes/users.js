@@ -156,10 +156,11 @@ router.post('/signup', [
     check('confirmpassword', 'please enter a password of 6 or more characters').isLength({ min: 6 }),
     check('level_type', 'please enter a level type').not().isEmpty(),
     check('age_group', 'please enter a Age Group').not().isEmpty(),
-    check('gender', 'please enter gender').not().isEmpty()
-
-
-
+    check('gender', 'please enter gender').not().isEmpty(),
+    check('parents', 'please enter a parent_name').not().isEmpty(),
+    check('zip_code', 'please enter zip_code').not().isEmpty(),
+    check('address', 'please enter address').not().isEmpty(),
+    check('city', 'please enter city').not().isEmpty()
 
 
 ], async (req, res, next) => {
@@ -224,6 +225,12 @@ router.post('/signup', [
             email: req.body.email.toLowerCase(),
             level_type: req.body.level_type,
             age_group: req.body.age_group,
+            level_type: req.body.level_type,
+            zip_code: req.body.zip_code,
+            city: req.body.city,
+            address: req.body.address,
+            parents:req.body.parents,
+
             image: pathName,
             gender:req.body.gender
         });
@@ -255,8 +262,7 @@ router.post('/signup', [
         res.status(200).json({
             msg: "Registration Success, please login to proceed",
             token: token,
-            "user": (_.pick(user, ['_id', 'username', 'email', 'image', 'level_type','age_group','is_premium','gender', 'createdAt','updatedAt']))
-            //  data: JSON.stringify(response1.data) 
+            "user": user            //  data: JSON.stringify(response1.data) 
         });
 
     } catch (error) {
