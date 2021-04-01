@@ -159,7 +159,6 @@ router.post('/signup', [
     check('gender', 'please enter gender').not().isEmpty(),
     check('parents', 'please enter a parent_name').not().isEmpty(),
     check('zip_code', 'please enter zip_code').not().isEmpty(),
-    check('address', 'please enter address').not().isEmpty(),
     check('city', 'please enter city').not().isEmpty()
 
 
@@ -228,9 +227,7 @@ router.post('/signup', [
             level_type: req.body.level_type,
             zip_code: req.body.zip_code,
             city: req.body.city,
-            address: req.body.address,
             parents:req.body.parents,
-
             image: pathName,
             gender:req.body.gender
         });
@@ -361,6 +358,7 @@ router.put('/edit',
             state,
             zip_code,
             address,
+            parents,
             phone_no
 
         } = req.body;

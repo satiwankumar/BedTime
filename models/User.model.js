@@ -103,16 +103,8 @@ const UserSchema = new mongoose.Schema({
     parents:{
         type:String,
         default:null
-    },
-    city:{
-        type:String
-    },
-    zip_code:{
-        type:String
-    },
-    address:{
-        type:String
     }
+   
     
 });
 
